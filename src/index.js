@@ -8,8 +8,10 @@ import MapComponent from './mapComponent';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {/* <App /> */}
-    <MapComponent />
+    <div>
+      <App />
+      <MapComponent />
+    </div>
   </React.StrictMode>
 );
 
