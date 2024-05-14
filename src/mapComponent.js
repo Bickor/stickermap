@@ -24,6 +24,7 @@ export default class SimpleMap extends React.Component {
         lng: e.detail.latLng.lng,
       };
 
+      //TODO: remove newPlace and only use 1 variable
       const newDoc = {
         id: this.state.places.length,
         geoPoint: new GeoPoint(e.detail.latLng.lat, e.detail.latLng.lng),
