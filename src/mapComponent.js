@@ -100,7 +100,7 @@ export default class SimpleMap extends React.Component {
         <APIProvider apiKey={API_KEY}>
           <Map
             key={"Map"}
-            mapId={"4504f8b37365c3d0"}
+            mapId={"0"}
             defaultZoom={3}
             defaultCenter={{lat: 22.54992, lng: 0}}
             gestureHandling={'greedy'}
