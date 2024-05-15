@@ -4,12 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## TODO
 - [ ] Improve sidebar
-- [ ] Add to firestore on adding marker
-- [ ] Add to state from firestore
-- [ ] Remove from firestore on removing marker
-- [ ] Host
 - [ ] Improve firestore documents to include picture, and who added it
-- [ ] Include authentication
 
 ## Available Scripts
 
