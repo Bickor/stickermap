@@ -15,7 +15,7 @@ export default class SimpleMap extends React.Component {
   }
 
   componentDidMount() {
-    this.readData();
+    // this.readData();
   }
 
   async readData() {
@@ -100,6 +100,7 @@ export default class SimpleMap extends React.Component {
         <APIProvider apiKey={API_KEY}>
           <Map
             key={"Map"}
+            mapId={"4504f8b37365c3d0"}
             defaultZoom={3}
             defaultCenter={{lat: 22.54992, lng: 0}}
             gestureHandling={'greedy'}
@@ -114,23 +115,14 @@ export default class SimpleMap extends React.Component {
                   position={{ lat: place.lat, lng: place.lng}}
                   onClick={(e) => this.removeMarker(e)}
                 />
-                {/* <InfoWindow position={{lat: place.lat, lng: place.lng}} maxWidth={200}>
-                  <p>
-                    This is the content for another infowindow with <em>HTML</em>
-                    -elements.
-                  </p>
-                </InfoWindow> */}
-                {/* <MarkerWithInfowindow/> */}
               </div>
             )
           })}
-            {/* <Marker
-              position={{lat: 10, lng: 10}}
-              clickable={true}
-              // onClick={() => alert('marker was clicked!')}
-              onClick={(e) => this.removeMarker(e)}
-              title={'clickable google.maps.Marker'}
-            /> */}
+            <MarkerWithInfowindow 
+              lat={10}
+              lng={10}
+              title={"Title"}
+            />
         </APIProvider>
       </div>
     )

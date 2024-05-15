@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   AdvancedMarker,
   InfoWindow,
   useAdvancedMarkerRef
 } from '@vis.gl/react-google-maps';
 
-export const MarkerWithInfowindow = () => {
-  const [infowindowOpen, setInfowindowOpen] = useState(true);
+export const MarkerWithInfowindow = ({ lat, lng, title }) => {
+  const [infowindowOpen, setInfowindowOpen] = useState(false);
   const [markerRef, marker] = useAdvancedMarkerRef();
 
   return (
@@ -14,8 +14,8 @@ export const MarkerWithInfowindow = () => {
       <AdvancedMarker
         ref={markerRef}
         onClick={() => setInfowindowOpen(true)}
-        position={{lat: 28, lng: -82}}
-        title={'AdvancedMarker that opens an Infowindow when clicked.'}
+        position={{ lat, lng }}
+        title={title}
       />
       {infowindowOpen && (
         <InfoWindow
@@ -23,7 +23,7 @@ export const MarkerWithInfowindow = () => {
           maxWidth={200}
           onCloseClick={() => setInfowindowOpen(false)}>
           This is an example for the{' '}
-          <code style={{whiteSpace: 'nowrap'}}>&lt;AdvancedMarker /&gt;</code>{' '}
+          <code style={{ whiteSpace: 'nowrap' }}>&lt;AdvancedMarker /&gt;</code>{' '}
           combined with an Infowindow.
         </InfoWindow>
       )}
