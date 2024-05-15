@@ -1,37 +1,61 @@
 import React from "react";
 import { APIProvider, Map, InfoWindow, Marker } from '@vis.gl/react-google-maps';
 import { MarkerWithInfowindow } from './markerWithInfoWindow';
-import { collection, addDoc, GeoPoint } from "firebase/firestore";
-import {db} from './config.js';
+import { collection, getDocs, addDoc, GeoPoint, doc, deleteDoc } from "firebase/firestore";
+import { v4 as uuidv4 } from 'uuid';
+import { db } from './config.js';
 import data from "./secrets.json"
 
 const API_KEY = data["key"];
 
 export default class SimpleMap extends React.Component {
-  // constructor(props) {
-  //   super(props)
-  // }
 
   state = {
     places: []
   }
 
+  
+
+  componentDidMount() {
+    this.readData();
+  }
+
+  async readData() {
+    const querySnapshot = await getDocs(collection(db, "markers"));
+    const places = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const markerData = data.marker; // Access marker data
+      if (markerData) { // Check if marker data is defined
+        const { geoPoint } = markerData;
+        if (geoPoint) { // Check if geoPoint is defined
+          const lat = geoPoint.latitude;
+          const lng = geoPoint.longitude;
+          places.push({
+            id: doc.id,
+            lat,
+            lng
+          });
+        }
+      }
+    });
+    this.setState({ places });
+  }
+
   async addMarker(e) {
     if (document.getElementById('vehicle1').checked) {
       const newPlace = {
-        id: this.state.places.length,
+        id: uuidv4(),
         lat: e.detail.latLng.lat,
         lng: e.detail.latLng.lng,
       };
 
       //TODO: remove newPlace and only use 1 variable
       const newDoc = {
-        id: this.state.places.length,
+        id: uuidv4(),
         geoPoint: new GeoPoint(e.detail.latLng.lat, e.detail.latLng.lng),
       }
-      // const addMarkerToFirestore = async (e) => {
-        // e.preventDefault();  
-       
+
         try {
           const docRef = await addDoc(collection(db, "markers"), {
             marker: newDoc,    
@@ -48,14 +72,33 @@ export default class SimpleMap extends React.Component {
     }
   }
 
-  removeMarker(e) {
-    let lat = e.latLng.lat()
-    let lng = e.latLng.lng()
+  async removeMarker(e) {
+    // Only remove if the remove checkbox is true.
     if (document.getElementById('vehicle2').checked) {
-      this.setState(prevState => ({
-        places: prevState.places.filter(place => !(place.lat === lat && place.lng === lng))
-      }));
-    }
+      const lat = e.latLng.lat()
+      const lng = e.latLng.lng()
+
+      // Get the id of the marker by checking the state
+      let id = 0;
+      for (let i = 0; i < this.state.places.length; i++) {
+        const place = this.state.places[i];
+        if (place.lat === lat && place.lng === lng) {
+          id = place.id;
+        }
+      }
+
+      // Remove from firestore
+      try {
+        const docRemove = await deleteDoc(doc(db, "markers", id));
+        // If it was removed from firestore, then remove from the state
+        this.setState(prevState => ({
+          places: prevState.places.filter(place => !(place.lat === lat && place.lng === lng))
+        }));
+      } catch (e) {
+        alert.error("Error adding document: ", e);
+      }
+      }
+        
   }
 
   render() {
