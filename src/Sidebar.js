@@ -1,7 +1,6 @@
-import logo from './logo.svg';
-import './App.css';
+import './Sidebar.css';
 
-function App() {
+function Sidebar() {
   return (
     <div className="App" style={{ height: '100vh', width: '20%', float: "left" }}>
       <h1>Stickermap</h1>
@@ -21,4 +20,4 @@ function App() {
   );
 }
 
-export default App;
+export default Sidebar;
