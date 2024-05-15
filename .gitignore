@@ -22,5 +22,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# firebase
+.firebase/
+.firebaserc
+firebase.json
+
+# Hidden files
 secrets.json
 config.js
