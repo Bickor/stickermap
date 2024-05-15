@@ -41,6 +41,7 @@ export default class SimpleMap extends React.Component {
   }
 
   async addMarker(e) {
+    console.log("adding")
     if (document.getElementById('add').checked) {
       const newPlace = {
         id: uuidv4(),
@@ -54,12 +55,14 @@ export default class SimpleMap extends React.Component {
       }
 
         try {
-          await addDoc(collection(db, "markers"), {
-            marker: newDoc,    
-          });
+          // await addDoc(collection(db, "markers"), {
+          //   marker: newDoc,    
+          // });
+          console.log("in try")
           this.setState({
             places: [...this.state.places, newPlace]
           })
+          console.log(this.state.places)
         } catch (e) {
           alert("Error adding document: ", e);
         }
@@ -89,7 +92,7 @@ export default class SimpleMap extends React.Component {
           places: prevState.places.filter(place => !(place.lat === lat && place.lng === lng))
         }));
       } catch (e) {
-        alert("Error adding marker");
+        alert("Error removing marker");
       }
     }
   }
@@ -110,10 +113,17 @@ export default class SimpleMap extends React.Component {
           {this.state.places.map(place => {
             return (
               <div>
-                <Marker
+                {/* <Marker
                   key={place.id}
                   position={{ lat: place.lat, lng: place.lng}}
                   onClick={(e) => this.removeMarker(e)}
+                /> */}
+                <MarkerWithInfowindow 
+                  key={place.id}
+                  lat={10}
+                  lng={10}
+                  title={"Title"}
+                  onClickFunc={(e) => this.removeMarker(e)}
                 />
               </div>
             )
@@ -122,6 +132,7 @@ export default class SimpleMap extends React.Component {
               lat={10}
               lng={10}
               title={"Title"}
+              onClickFunc={(e) => this.removeMarker(e)}
             />
         </APIProvider>
       </div>
