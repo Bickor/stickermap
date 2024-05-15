@@ -1,5 +1,5 @@
 import React from "react";
-import { APIProvider, Map, InfoWindow, Marker } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
 import { MarkerWithInfowindow } from './markerWithInfoWindow';
 import { collection, getDocs, addDoc, GeoPoint, doc, deleteDoc } from "firebase/firestore";
 import { v4 as uuidv4 } from 'uuid';
@@ -13,8 +13,6 @@ export default class SimpleMap extends React.Component {
   state = {
     places: []
   }
-
-  
 
   componentDidMount() {
     this.readData();
@@ -43,38 +41,34 @@ export default class SimpleMap extends React.Component {
   }
 
   async addMarker(e) {
-    if (document.getElementById('vehicle1').checked) {
+    if (document.getElementById('add').checked) {
       const newPlace = {
         id: uuidv4(),
         lat: e.detail.latLng.lat,
         lng: e.detail.latLng.lng,
       };
 
-      //TODO: remove newPlace and only use 1 variable
       const newDoc = {
         id: uuidv4(),
         geoPoint: new GeoPoint(e.detail.latLng.lat, e.detail.latLng.lng),
       }
 
         try {
-          const docRef = await addDoc(collection(db, "markers"), {
+          await addDoc(collection(db, "markers"), {
             marker: newDoc,    
           });
-          console.log("Document written with ID: ", docRef.id);
+          this.setState({
+            places: [...this.state.places, newPlace]
+          })
         } catch (e) {
-          console.error("Error adding document: ", e);
+          alert("Error adding document: ", e);
         }
-    // }
-
-      this.setState({
-        places: [...this.state.places, newPlace]
-      })
     }
   }
 
   async removeMarker(e) {
     // Only remove if the remove checkbox is true.
-    if (document.getElementById('vehicle2').checked) {
+    if (document.getElementById('remove').checked) {
       const lat = e.latLng.lat()
       const lng = e.latLng.lng()
 
@@ -89,16 +83,15 @@ export default class SimpleMap extends React.Component {
 
       // Remove from firestore
       try {
-        const docRemove = await deleteDoc(doc(db, "markers", id));
+        await deleteDoc(doc(db, "markers", id));
         // If it was removed from firestore, then remove from the state
         this.setState(prevState => ({
           places: prevState.places.filter(place => !(place.lat === lat && place.lng === lng))
         }));
       } catch (e) {
-        alert.error("Error adding document: ", e);
+        alert("Error adding marker");
       }
-      }
-        
+    }
   }
 
   render() {

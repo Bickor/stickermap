@@ -2,20 +2,19 @@ import './Sidebar.css';
 
 function Sidebar() {
   return (
-    <div className="App" style={{ height: '100vh', width: '20%', float: "left" }}>
+    <div className="Sidebar">
       <h1>Stickermap</h1>
-      <p>Stickers!!</p>
-      <div style={{}}>
+      <p>Agreguen las ubicaciones de los stickers.</p>
+      <div className="checkbox-wrapper">
         <div>
-          <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike" style={{ float: "left" }}></input>
-          <div style={{ float: "left" }}>Add Marker</div>
+          <input type="checkbox" id="add" />
+          <label htmlFor="add">Agregar Marcador</label>
         </div>
         <div>
-          <input type="checkbox" id="vehicle2" name="vehicle2" value="Bike" style={{ float: "left" }}></input>
-          <div style={{ float: "left" }}>Remove Marker</div>
+          <input type="checkbox" id="remove" />
+          <label htmlFor="remove">Borrar Marcador</label>
         </div>
       </div>
-
     </div>
   );
 }
