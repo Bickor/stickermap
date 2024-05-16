@@ -104,6 +104,7 @@ export default class SimpleMap extends React.Component {
             defaultCenter={{lat: 22.54992, lng: 0}}
             gestureHandling={'greedy'}
             disableDefaultUI={true}
+            mapTypeId={'hybrid'}
             onClick={(e) => this.addMarker(e)}
           />
           {this.state.places.map(place => {
