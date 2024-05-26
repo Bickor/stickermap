@@ -1,18 +1,26 @@
 import React from "react";
-import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
-import { MarkerWithInfowindow } from './markerWithInfoWindow';
-import { collection, getDocs, addDoc, GeoPoint, doc, deleteDoc } from "firebase/firestore";
-import { v4 as uuidv4 } from 'uuid';
-import { db } from './config.js';
-import data from "./secrets.json"
+import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
+import { MarkerWithInfowindow } from "./markerWithInfoWindow";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  GeoPoint,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { v4 as uuidv4 } from "uuid";
+import { db } from "./config.js";
+import data from "./secrets.json";
 
 const API_KEY = data["key"];
 
 export default class SimpleMap extends React.Component {
-
   state = {
-    places: []
-  }
+    places: [],
+  };
 
   componentDidMount() {
     this.readData();
@@ -24,15 +32,17 @@ export default class SimpleMap extends React.Component {
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       const markerData = data.marker; // Access marker data
-      if (markerData) { // Check if marker data is defined
+      if (markerData) {
+        // Check if marker data is defined
         const { geoPoint } = markerData;
-        if (geoPoint) { // Check if geoPoint is defined
+        if (geoPoint) {
+          // Check if geoPoint is defined
           const lat = geoPoint.latitude;
           const lng = geoPoint.longitude;
           places.push({
             id: doc.id,
             lat,
-            lng
+            lng,
           });
         }
       }
@@ -40,8 +50,29 @@ export default class SimpleMap extends React.Component {
     this.setState({ places });
   }
 
+  async updateCurrentMarkerCount(operator) {
+    const querySnapshot = await getDocs(collection(db, "total_markers"));
+    let currentTotalMarkers = 0;
+    let id = "";
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      id = doc.id;
+      currentTotalMarkers = data.Total;
+    });
+    const updatedTotalMarkers = currentTotalMarkers + operator;
+    try {
+      await updateDoc(doc(db, "total_markers", id), {
+        Total: updatedTotalMarkers,
+      });
+    } catch (e) {
+      alert("Something went wrong updating the total: " + e.message);
+    }
+    return updatedTotalMarkers;
+  }
+
   async addMarker(e) {
-    if (document.getElementById('add').checked) {
+    var user = getAuth().currentUser;
+    if (document.getElementById("add").checked) {
       const newPlace = {
         id: uuidv4(),
         lat: e.detail.latLng.lat,
@@ -51,26 +82,32 @@ export default class SimpleMap extends React.Component {
       const newDoc = {
         id: uuidv4(),
         geoPoint: new GeoPoint(e.detail.latLng.lat, e.detail.latLng.lng),
-      }
+        user: {
+          name: user.displayName,
+          email: user.email,
+        },
+      };
 
-        try {
-          await addDoc(collection(db, "markers"), {
-            marker: newDoc,    
-          });
-          this.setState({
-            places: [...this.state.places, newPlace]
-          })
-        } catch (e) {
-          alert("Error adding document: ", e);
-        }
+      try {
+        await addDoc(collection(db, "markers"), {
+          marker: newDoc,
+        });
+        this.setState({
+          places: [...this.state.places, newPlace],
+        });
+        let newTotal = await this.updateCurrentMarkerCount(1);
+        this.props.updateTotalMarkers(newTotal);
+      } catch (e) {
+        alert("Error adding document: ", e);
+      }
     }
   }
 
   async removeMarker(e) {
     // Only remove if the remove checkbox is true.
-    if (document.getElementById('remove').checked) {
-      const lat = e.latLng.lat()
-      const lng = e.latLng.lng()
+    if (document.getElementById("remove").checked) {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
 
       // Get the id of the marker by checking the state
       let id = 0;
@@ -85,9 +122,13 @@ export default class SimpleMap extends React.Component {
       try {
         await deleteDoc(doc(db, "markers", id));
         // If it was removed from firestore, then remove from the state
-        this.setState(prevState => ({
-          places: prevState.places.filter(place => !(place.lat === lat && place.lng === lng))
+        this.setState((prevState) => ({
+          places: prevState.places.filter(
+            (place) => !(place.lat === lat && place.lng === lng),
+          ),
         }));
+        let newTotal = await this.updateCurrentMarkerCount(-1);
+        this.props.updateTotalMarkers(newTotal);
       } catch (e) {
         alert("Error adding marker");
       }
@@ -96,23 +137,23 @@ export default class SimpleMap extends React.Component {
 
   render() {
     return (
-      <div style={{ height: '100vh', width: '80%', float: "left" }}>
+      <div style={{ height: "100vh", width: "80%", float: "left" }}>
         <APIProvider apiKey={API_KEY}>
           <Map
             key={"Map"}
             defaultZoom={3}
-            defaultCenter={{lat: 22.54992, lng: 0}}
-            gestureHandling={'greedy'}
+            defaultCenter={{ lat: 22.54992, lng: 0 }}
+            gestureHandling={"greedy"}
             disableDefaultUI={true}
-            mapTypeId={'hybrid'}
+            mapTypeId={"hybrid"}
             onClick={(e) => this.addMarker(e)}
           />
-          {this.state.places.map(place => {
+          {this.state.places.map((place) => {
             return (
               <div>
                 <Marker
                   key={place.id}
-                  position={{ lat: place.lat, lng: place.lng}}
+                  position={{ lat: place.lat, lng: place.lng }}
                   onClick={(e) => this.removeMarker(e)}
                 />
                 {/* <InfoWindow position={{lat: place.lat, lng: place.lng}} maxWidth={200}>
@@ -123,9 +164,9 @@ export default class SimpleMap extends React.Component {
                 </InfoWindow> */}
                 {/* <MarkerWithInfowindow/> */}
               </div>
-            )
+            );
           })}
-            {/* <Marker
+          {/* <Marker
               position={{lat: 10, lng: 10}}
               clickable={true}
               // onClick={() => alert('marker was clicked!')}
@@ -134,6 +175,6 @@ export default class SimpleMap extends React.Component {
             /> */}
         </APIProvider>
       </div>
-    )
+    );
   }
 }

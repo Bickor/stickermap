@@ -1,22 +1,28 @@
-import './Sidebar.css';
+import React from "react";
+import "./Sidebar.css";
 
-function Sidebar() {
-  return (
-    <div className="Sidebar">
-      <h1>Stickermap</h1>
-      <p>Agreguen las ubicaciones de los stickers.</p>
-      <div className="checkbox-wrapper">
-        <div>
-          <input type="checkbox" id="add" />
-          <label htmlFor="add">Agregar Marcador</label>
+export default class Sidebar extends React.Component {
+  render() {
+    return (
+      <div className="Sidebar">
+        <h1>Stickermap</h1>
+        <p>Agreguen las ubicaciones de los stickers.</p>
+        <h3>Controles</h3>
+        <div className="checkbox-wrapper">
+          <div>
+            <input type="checkbox" id="add" />
+            <label htmlFor="add">Agregar Marcador</label>
+          </div>
+          <div>
+            <input type="checkbox" id="remove" />
+            <label htmlFor="remove">Borrar Marcador</label>
+          </div>
         </div>
-        <div>
-          <input type="checkbox" id="remove" />
-          <label htmlFor="remove">Borrar Marcador</label>
+        <h3>Estadisticas</h3>
+        <div className="Counter">
+          <p>Tenemos un total de {this.props.totalMarkers} marcadores.</p>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
-
-export default Sidebar;
